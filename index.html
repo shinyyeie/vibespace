@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>RYSLYAOV — Vibespace</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100vh;display:flex;overflow:hidden}
+
+/* ===== ЛЕВАЯ ПАНЕЛЬ (СЕРВЕРЫ) ===== */
+.servers{width:72px;background:#1e1f22;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:8px;flex-shrink:0;overflow-y:auto}
+.servers::-webkit-scrollbar{width:0}
+.server-icon{width:48px;height:48px;border-radius:16px;background:#2b2d31;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:18px;color:#dcddde;cursor:pointer;transition:0.15s;position:relative;flex-shrink:0}
+.server-icon:hover{border-radius:12px;background:#5865f2;color:#fff}
+.server-icon.active{background:#5865f2;color:#fff;border-radius:12px}
+.server-icon .badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:#ed4245;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.server-divider{width:32px;height:2px;background:#2b2d31;border-radius:2px;flex-shrink:0}
+.add-server{width:48px;height:48px;border-radius:16px;background:#1e1f22;border:2px dashed #2b2d31;display:flex;align-items:center;justify-content:center;font-size:28px;color:#3d8a40;cursor:pointer;transition:0.15s;flex-shrink:0}
+.add-server:hover{background:#2b2d31;border-color:#3d8a40}
+
+/* ===== ПАНЕЛЬ КАНАЛОВ ===== */
+.channels{width:240px;background:#2b2d31;display:flex;flex-direction:column;flex-shrink:0}
+.channels-header{padding:16px 16px 8px;border-bottom:1px solid #1e1f22}
+.channels-header .server-name{font-weight:600;font-size:16px;color:#fff;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.channels-header .server-name .arrow{font-size:12px;color:#6a6a8a}
+.channels-list{flex:1;overflow-y:auto;padding:8px 8px 0}
+.channels-list::-webkit-scrollbar{width:4px}
+.channels-list::-webkit-scrollbar-thumb{background:#1e1f22;border-radius:10px}
+.channel-category{padding:12px 8px 4px;font-size:12px;font-weight:700;color:#6a6a8a;text-transform:uppercase;letter-spacing:0.5px}
+.channel-item{padding:6px 8px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:14px;color:#9a9ba0;transition:0.1s;margin-bottom:1px}
+.channel-item:hover{background:#2b2d31;color:#dcddde}
+.channel-item.active{background:#3d3f45;color:#fff}
+.channel-item .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.channel-item .hash{color:#6a6a8a;font-weight:400}
+.channel-item.active .hash{color:#fff}
+.channel-item .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ===== ОСНОВНОЙ ЧАТ ===== */
+.chat{flex:1;display:flex;flex-direction:column;background:#313338;min-width:0}
+.chat-header{padding:12px 16px;border-bottom:1px solid #1e1f22;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#313338}
+.chat-header .left{display:flex;align-items:center;gap:10px}
+.chat-header .left .channel-name{font-weight:600;font-size:16px;color:#fff}
+.chat-header .left .topic{font-size:13px;color:#9a9ba0;margin-left:8px}
+.chat-header .right{display:flex;gap:4px}
+.chat-header .right button{background:none;border:none;color:#9a9ba0;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:0.1s}
+.chat-header .right button:hover{background:#2b2d31;color:#fff}
+
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:2px}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:#1e1f22;border-radius:10px}
+.msg-group{margin-bottom:4px}
+.msg-group .msg-author{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.msg-group .msg-author .avatar{width:32px;height:32px;border-radius:50%;background:#5865f2;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#fff;flex-shrink:0}
+.msg-group .msg-author .name{font-weight:500;font-size:14px;color:#fff}
+.msg-group .msg-author .time{font-size:11px;color:#6a6a8a}
+.msg-group .msg-text{font-size:14px;color:#dcddde;padding-left:40px;word-wrap:break-word}
+.msg-group .msg-text .copy-btn{background:none;border:none;color:#6a6a8a;font-size:12px;cursor:pointer;margin-left:8px;opacity:0;transition:0.1s}
+.msg-group:hover .msg-text .copy-btn{opacity:1}
+.msg-group .msg-text .copy-btn:hover{color:#fff}
+
+/* ===== ПОЛЕ ВВОДА ===== */
+.input-area{padding:0 16px 16px;background:#313338;flex-shrink:0}
+.input-area .input-wrap{background:#383a40;border-radius:8px;display:flex;align-items:center;padding:4px 12px;border:1px solid transparent;transition:0.15s}
+.input-area .input-wrap:focus-within{border-color:#5865f2}
+.input-area .input-wrap input{flex:1;background:none;border:none;padding:10px 0;color:#dcddde;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.input-area .input-wrap input::placeholder{color:#6a6a8a}
+.input-area .input-wrap button{background:#5865f2;border:none;border-radius:6px;padding:6px 14px;color:#fff;font-weight:600;font-size:13px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;flex-shrink:0}
+.input-area .input-wrap button:hover{background:#4752c4}
+
+/* ===== ПАНЕЛЬ УЧАСТНИКОВ ===== */
+.members{width:240px;background:#2b2d31;display:flex;flex-direction:column;flex-shrink:0;border-left:1px solid #1e1f22}
+.members-header{padding:20px 16px 12px;font-size:13px;font-weight:700;color:#6a6a8a;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #1e1f22}
+.members-list{flex:1;overflow-y:auto;padding:8px 8px 0}
+.members-list::-webkit-scrollbar{width:4px}
+.members-list::-webkit-scrollbar-thumb{background:#1e1f22;border-radius:10px}
+.member-item{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:8px;cursor:pointer;transition:0.1s;margin-bottom:1px}
+.member-item:hover{background:#313338}
+.member-item .m-avatar{width:28px;height:28px;border-radius:50%;background:#5865f2;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;flex-shrink:0}
+.member-item .m-name{font-size:14px;color:#dcddde;flex:1}
+.member-item .m-status{width:8px;height:8px;border-radius:50%;background:#3d8a40;flex-shrink:0}
+.member-item .m-status.offline{background:#6a6a8a}
+
+/* ===== МОДАЛКИ ===== */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:999}
+.modal.active{display:flex}
+.modal-content{background:#313338;max-width:480px;width:92%;border-radius:16px;padding:32px;border:1px solid #1e1f22}
+.modal-content h2{color:#fff;font-weight:600;font-size:24px;margin-bottom:8px}
+.modal-content .sub{color:#9a9ba0;font-size:14px;margin-bottom:20px}
+.modal-content input{width:100%;background:#1e1f22;border:none;padding:12px 16px;border-radius:8px;font-size:14px;color:#dcddde;font-family:'Inter',sans-serif;margin-bottom:10px;outline:none}
+.modal-content input:focus{border:2px solid #5865f2}
+.modal-content .btn-primary{width:100%;background:#5865f2;border:none;padding:12px;border-radius:8px;color:#fff;font-weight:600;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif}
+.modal-content .btn-primary:hover{background:#4752c4}
+.modal-content .btn-secondary{width:100%;background:#1e1f22;border:none;padding:12px;border-radius:8px;color:#dcddde;font-weight:500;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;margin-top:8px}
+.modal-content .btn-secondary:hover{background:#2b2d31}
+.modal-content .switch{color:#5865f2;cursor:pointer;font-size:14px;text-align:center;margin-top:12px}
+.modal-content .switch:hover{text-decoration:underline}
+.modal-content .db-box{background:#1e1f22;padding:16px;border-radius:8px;font-family:'Inter',monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;font-size:13px;color:#9a9ba0;border:1px solid #2b2d31;margin-top:8px}
+.modal-content .close{float:right;background:none;border:none;color:#6a6a8a;font-size:28px;cursor:pointer;transition:0.15s}
+.modal-content .close:hover{color:#ed4245}
+
+/* ===== АДАПТИВ ===== */
+@media(max-width:768px){.servers{width:56px}.channels,.members{display:none}.chat{flex:1}}
+</style>
+</head>
+<body>
+
+<!-- ===== СЕРВЕРЫ ===== -->
+<div class="servers" id="serverList">
+    <div class="server-icon active" data-server="main">V</div>
+    <div class="server-divider"></div>
+    <div class="add-server" onclick="createServer()">+</div>
+</div>
+
+<!-- ===== КАНАЛЫ ===== -->
+<div class="channels" id="channelPanel">
+    <div class="channels-header">
+        <div class="server-name" id="currentServerName">Vibespace <span class="arrow">▼</span></div>
+    </div>
+    <div class="channels-list" id="channelList">
+        <div class="channel-category">Текстовые каналы</div>
+        <div class="channel-item active" data-channel="general">
+            <span class="hash">#</span><span class="name">общий</span>
+        </div>
+        <div class="channel-item" data-channel="random">
+            <span class="hash">#</span><span class="name">случайный</span>
+        </div>
+        <div class="channel-category">Голосовые</div>
+        <div class="channel-item" data-channel="voice">
+            <span class="icon">🔊</span><span class="name">Голосовой</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ЧАТ ===== -->
+<div class="chat" id="chatPanel">
+    <div class="chat-header">
+        <div class="left">
+            <span class="channel-name" id="currentChannel"># общий</span>
+            <span class="topic" id="channelTopic">Добро пожаловать в Vibespace!</span>
+        </div>
+        <div class="right">
+            <button onclick="openAdmin()" title="Админ панель">⚙️</button>
+        </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="input-area">
+        <div class="input-wrap">
+            <input id="msgInput" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== УЧАСТНИКИ ===== -->
+<div class="members" id="memberPanel">
+    <div class="members-header">Участники — <span id="memberCount">0</span></div>
+    <div class="members-list" id="memberList"></div>
+</div>
+
+<!-- ===== МОДАЛКА ВХОДА ===== -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('loginModal')">&times;</button>
+        <h2>Добро пожаловать</h2>
+        <div class="sub">Войдите в свой аккаунт</div>
+        <input id="loginUser" placeholder="Логин">
+        <input id="loginPass" type="password" placeholder="Пароль">
+        <button class="btn-primary" onclick="loginUser()">Войти</button>
+        <div class="switch" onclick="switchModal('loginModal','registerModal')">Нет аккаунта? Зарегистрируйтесь</div>
+    </div>
+</div>
+
+<!-- ===== МОДАЛКА РЕГИСТРАЦИИ ===== -->
+<div class="modal" id="registerModal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('registerModal')">&times;</button>
+        <h2>Создать аккаунт</h2>
+        <div class="sub">Присоединяйтесь к Vibespace</div>
+        <input id="regUser" placeholder="Логин">
+        <input id="regPass" type="password" placeholder="Пароль">
+        <button class="btn-primary" onclick="registerUser()">Зарегистрироваться</button>
+        <div class="switch" onclick="switchModal('registerModal','loginModal')">Уже есть аккаунт? Войдите</div>
+    </div>
+</div>
+
+<!-- ===== МОДАЛКА АДМИНКИ ===== -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <button class="close" onclick="closeModal('adminModal')">&times;</button>
+        <h2>🔐 Админ панель</h2>
+        <div class="sub">Введите код доступа</div>
+        <input id="adminCode" type="password" placeholder="Код доступа" value="74522i2sO4Eq0">
+        <button class="btn-primary" onclick="adminLogin()">Войти</button>
+        <div id="adminContent" style="display:none;margin-top:16px">
+            <h3 style="color:#fff;font-size:16px;margin-bottom:8px">🗄️ База данных пользователей</h3>
+            <div class="db-box" id="dbDisplay">(пусто)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ====== СОСТОЯНИЕ ======
+let state = {
+    users: {},
+    currentUser: null,
+    currentChannel: 'general',
+    messages: {
+        general: [],
+        random: [],
+        voice: []
+    },
+    channels: ['general', 'random', 'voice'],
+    serverName: 'Vibespace',
+    adminLogged: false,
+    logs: []
+};
+
+// ====== ИНИЦИАЛИЗАЦИЯ ======
+function init() {
+    state.users['admin'] = 'admin123';
+    state.users['ван'] = '123';
+    state.users['test'] = 'test';
+    
+    state.messages.general = [
+        {author: 'admin', text: 'Добро пожаловать в Vibespace!', time: new Date().toLocaleTimeString()},
+        {author: 'ван', text: 'Привет всем!', time: new Date().toLocaleTimeString()}
+    ];
+    state.messages.random = [
+        {author: 'admin', text: 'Это случайный канал', time: new Date().toLocaleTimeString()}
+    ];
+    
+    let saved = localStorage.getItem('rys_session');
+    state.currentUser = (saved && state.users[saved]) ? saved : 'admin';
+    
+    renderAll();
+    updateUI();
+}
+
+function renderAll() {
+    renderMessages();
+    renderMembers();
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById('currentChannel').textContent = '# ' + state.currentChannel;
+    document.getElementById('currentServerName').innerHTML = state.serverName + ' <span class="arrow">▼</span>';
+    document.getElementById('memberCount').textContent = Object.keys(state.users).length;
+    
+    document.querySelectorAll('.channel-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.channel === state.currentChannel);
+    });
+}
+
+// ====== СООБЩЕНИЯ ======
+function renderMessages() {
+    let container = document.getElementById('chatMessages');
+    let msgs = state.messages[state.currentChannel] || [];
+    container.innerHTML = '';
+    
+    msgs.forEach(msg => {
+        let group = document.createElement('div');
+        group.className = 'msg-group';
+        
+        let author = document.createElement('div');
+        author.className = 'msg-author';
+        let avatar = document.createElement('div');
+        avatar.className = 'avatar';
+        avatar.textContent = msg.author[0].toUpperCase();
+        let name = document.createElement('span');
+        name.className = 'name';
+        name.textContent = msg.author;
+        let time = document.createElement('span');
+        time.className = 'time';
+        time.textContent = msg.time || new Date().toLocaleTimeString();
+        author.appendChild(avatar);
+        author.appendChild(name);
+        author.appendChild(time);
+        
+        let text = document.createElement('div');
+        text.className = 'msg-text';
+        text.innerHTML = msg.text + ' <button class="copy-btn" onclick="copyText(this)">Копировать</button>';
+        
+        group.appendChild(author);
+        group.appendChild(text);
+        container.appendChild(group);
+    });
+    container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+    let input = document.getElementById('msgInput');
+    let text = input.value.trim();
+    if (!text || !state.currentUser) return;
+    
+    if (!state.messages[state.currentChannel]) {
+        state.messages[state.currentChannel] = [];
+    }
+    state.messages[state.currentChannel].push({
+        author: state.currentUser,
+        text: text,
+        time: new Date().toLocaleTimeString()
+    });
+    input.value = '';
+    renderMessages();
+    addLog(state.currentUser + ': ' + text);
+}
+
+function copyText(btn) {
+    let text = btn.parentElement.textContent.replace('Копировать', '').trim();
+    navigator.clipboard.writeText(text).catch(() => {});
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = 'Копировать'; }, 1500);
+}
+
+// ====== ПЕРЕКЛЮЧЕНИЕ КАНАЛОВ ======
+document.querySelectorAll('.channel-item').forEach(el => {
+    el.addEventListener('click', function() {
+        state.currentChannel = this.dataset.channel;
+        renderAll();
+        updateUI();
+    });
+});
+
+// ====== АККАУНТЫ ======
+function registerUser() {
+    let login = document.getElementById('regUser').value.trim();
+    let pass = document.getElementById('regPass').value.trim();
+    if (!login || !pass) { alert('Заполните все поля'); return; }
+    if (state.users[login]) { alert('Логин занят'); return; }
+    state.users[login] = pass;
+    state.currentUser = login;
+    localStorage.setItem('rys_session', login);
+    closeModal('registerModal');
+    renderAll();
+    updateUI();
+    addLog('Регистрация: ' + login);
+    alert('Аккаунт создан!');
+}
+
+function loginUser() {
+    let login = document.getElementById('loginUser').value.trim();
+    let pass = document.getElementById('loginPass').value.trim();
+    if (!login || !pass) { alert('Заполните все поля'); return; }
+    if (state.users[login] === pass) {
+        state.currentUser = login;
+        localStorage.setItem('rys_session', login);
+        closeModal('loginModal');
+        renderAll();
+        updateUI();
+        addLog('Вход: ' + login);
+    } else {
+        alert('Неверный логин или пароль');
+    }
+}
+
+function logoutUser() {
+    state.currentUser = null;
+    localStorage.removeItem('rys_session');
+    openModal('loginModal');
+    renderAll();
+    updateUI();
+}
+
+// ====== МОДАЛКИ ======
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function switchModal(from, to) { closeModal(from); openModal(to); }
+
+// ====== АДМИНКА ======
+function openAdmin() {
+    openModal('adminModal');
+    document.getElementById('adminContent').style.display = 'none';
+    document.getElementById('adminCode').value = '74522i2sO4Eq0';
+}
+
+function adminLogin() {
+    let code = document.getElementById('adminCode').value;
+    if (code === '74522i2sO4Eq0') {
+        state.adminLogged = true;
+        document.getElementById('adminContent').style.display = 'block';
+        updateDB();
+        alert('Доступ разрешён');
+    } else {
+        alert('Неверный код');
+    }
+}
+
+function updateDB() {
+    let str = '';
+    for (let [login, pass] of Object.entries(state.users)) {
+        str += login + ':' + pass + '
+';
+    }
+    document.getElementById('dbDisplay').textContent = str || '(пусто)';
+}
+
+function addLog(msg) {
+    let time = new Date().toLocaleTimeString();
+    state.logs.push('[' + time + '] ' + msg);
+}
+
+// ====== СОЗДАНИЕ СЕРВЕРА ======
+function createServer() {
+    let name = prompt('Название сервера:');
+    if (name && name.trim()) {
+        state.serverName = name.trim();
+        updateUI();
+        addLog('Создан сервер: ' + state.serverName);
+    }
+}
+
+// ====== УЧАСТНИКИ ======
+function renderMembers() {
+    let container = document.getElementById('memberList');
+    container.innerHTML = '';
+    for (let login of Object.keys(state.users)) {
+        let div = document.createElement('div');
+        div.className = 'member-item';
+        let avatar = document.createElement('div');
+        avatar.className = 'm-avatar';
+        avatar.textContent = login[0].toUpperCase();
+        let name = document.createElement('span');
+        name.className = 'm-name';
+        name.textContent = login + (login === state.currentUser ? ' (вы)' : '');
+        let status = document.createElement('div');
+        status.className = 'm-status' + (login === state.currentUser ? '' : ' offline');
+        div.appendChild(avatar);
+        div.appendChild(name);
+        div.appendChild(status);
+        container.appendChild(div);
+    }
+}
+
+// ====== ЗАПУСК ======
+window.onload = function() {
+    if (!localStorage.getItem('rys_session')) {
+        openModal('loginModal');
+    }
+    init();
+    let header = document.querySelector('.chat-header .right');
+    let logoutBtn = document.createElement('button');
+    logoutBtn.textContent = '🚪';
+    logoutBtn.title = 'Выйти';
+    logoutBtn.onclick = logoutUser;
+    header.appendChild(logoutBtn);
+};
+</script>
+</body>
+</html>
