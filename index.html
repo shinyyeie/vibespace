@@ -22,9 +22,11 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .auth-box .switch{color:#5865f2;cursor:pointer;font-size:14px;text-align:center;margin-top:12px}
 .auth-box .switch:hover{text-decoration:underline}
 .auth-box .error{color:#ed4245;font-size:13px;margin-bottom:12px;display:none}
+.auth-box .btn-secondary{width:100%;background:#2b2d31;border:none;padding:12px;border-radius:8px;color:#dcddde;font-weight:500;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;margin-top:8px}
+.auth-box .btn-secondary:hover{background:#383a40}
 
 /* ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== */
-.main-app{display:flex;width:100%;height:100vh;overflow:hidden}
+.main-app{display:none;width:100%;height:100vh;overflow:hidden}
 .servers{width:60px;background:#1e1f22;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:6px;flex-shrink:0;overflow-y:auto}
 .servers::-webkit-scrollbar{width:0}
 .server-icon{width:42px;height:42px;border-radius:14px;background:#2b2d31;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;color:#dcddde;cursor:pointer;transition:0.15s;flex-shrink:0}
@@ -132,7 +134,8 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
         <input id="loginUser" placeholder="Логин">
         <input id="loginPass" type="password" placeholder="Пароль">
         <button class="btn-primary" onclick="loginUser()">Войти</button>
-        <div class="switch" onclick="showPage('registerPage')">Нет аккаунта? Зарегистрируйтесь</div>
+        <!-- ===== КНОПКА ЗАРЕГИСТРИРОВАТЬСЯ (РАБОЧАЯ) ===== -->
+        <button class="btn-secondary" onclick="showPage('registerPage')">📝 Зарегистрироваться</button>
     </div>
 </div>
 
@@ -145,7 +148,7 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
         <input id="regUser" placeholder="Логин">
         <input id="regPass" type="password" placeholder="Пароль">
         <button class="btn-primary" onclick="registerUser()">Зарегистрироваться</button>
-        <div class="switch" onclick="showPage('loginPage')">Уже есть аккаунт? Войдите</div>
+        <button class="btn-secondary" onclick="showPage('loginPage')">← Назад к входу</button>
     </div>
 </div>
 
