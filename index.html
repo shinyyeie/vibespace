@@ -19,11 +19,12 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .auth-box input:focus{border:2px solid #5865f2}
 .auth-box .btn-primary{width:100%;background:#5865f2;border:none;padding:12px;border-radius:8px;color:#fff;font-weight:600;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif}
 .auth-box .btn-primary:hover{background:#4752c4}
+.auth-box .btn-secondary{width:100%;background:#2b2d31;border:none;padding:12px;border-radius:8px;color:#dcddde;font-weight:500;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;margin-top:8px}
+.auth-box .btn-secondary:hover{background:#383a40}
 .auth-box .switch{color:#5865f2;cursor:pointer;font-size:14px;text-align:center;margin-top:12px}
 .auth-box .switch:hover{text-decoration:underline}
 .auth-box .error{color:#ed4245;font-size:13px;margin-bottom:12px;display:none}
-.auth-box .btn-secondary{width:100%;background:#2b2d31;border:none;padding:12px;border-radius:8px;color:#dcddde;font-weight:500;font-size:14px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;margin-top:8px}
-.auth-box .btn-secondary:hover{background:#383a40}
+.auth-box .success{color:#3d8a40;font-size:13px;margin-bottom:12px;display:none}
 
 /* ===== ОСНОВНОЙ ИНТЕРФЕЙС ===== */
 .main-app{display:none;width:100%;height:100vh;overflow:hidden}
@@ -133,8 +134,7 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
         <div class="error" id="loginError">Неверный логин или пароль</div>
         <input id="loginUser" placeholder="Логин">
         <input id="loginPass" type="password" placeholder="Пароль">
-        <button class="btn-primary" onclick="loginUser()">Войти</button>
-        <!-- ===== КНОПКА ЗАРЕГИСТРИРОВАТЬСЯ (РАБОЧАЯ) ===== -->
+        <button class="btn-primary" onclick="loginUser()">Вход</button>
         <button class="btn-secondary" onclick="showPage('registerPage')">📝 Зарегистрироваться</button>
     </div>
 </div>
@@ -145,8 +145,11 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
         <h1>Создать аккаунт</h1>
         <div class="sub">Присоединяйтесь к Vibespace</div>
         <div class="error" id="registerError">Логин уже занят</div>
-        <input id="regUser" placeholder="Логин">
-        <input id="regPass" type="password" placeholder="Пароль">
+        <div class="error" id="passError">Пароли не совпадают</div>
+        <div class="success" id="registerSuccess">Аккаунт создан! Вход...</div>
+        <input id="regUser" placeholder="Придумайте логин">
+        <input id="regPass" type="password" placeholder="Придумайте пароль">
+        <input id="regPassConfirm" type="password" placeholder="Повторите пароль">
         <button class="btn-primary" onclick="registerUser()">Зарегистрироваться</button>
         <button class="btn-secondary" onclick="showPage('loginPage')">← Назад к входу</button>
     </div>
@@ -291,8 +294,8 @@ function saveState() {
 function showPage(id) {
     document.querySelectorAll('.auth-page').forEach(p => p.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    document.getElementById('loginError').style.display = 'none';
-    document.getElementById('registerError').style.display = 'none';
+    document.querySelectorAll('.auth-box .error').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.auth-box .success').forEach(e => e.style.display = 'none');
 }
 
 function showApp() {
@@ -306,9 +309,7 @@ function showApp() {
 function initApp() {
     if (Object.keys(state.users).length === 0) {
         state.users['admin'] = 'admin123';
-        state.users['ван'] = '123';
         state.profiles['admin'] = {nick:'admin', desc:'Главный администратор'};
-        state.profiles['ван'] = {nick:'ван', desc:'Просто ван'};
     }
     if (state.messages.general.length === 0) {
         state.messages.general = [
@@ -330,7 +331,8 @@ function updateUI() {
     document.getElementById('currentChannel').textContent = '# ' + state.currentChannel;
     document.getElementById('marqueeText').textContent = state.marqueeText;
     document.getElementById('memberCount').textContent = Object.keys(state.users).length;
-    document.getElementById('userBadge').textContent = '👤 ' + (state.profiles[state.currentUser]?.nick || state.currentUser || 'гость');
+    let nick = state.profiles[state.currentUser]?.nick || state.currentUser || 'гость';
+    document.getElementById('userBadge').textContent = '👤 ' + nick;
     
     document.querySelectorAll('.channel-item').forEach(el => {
         el.classList.toggle('active', el.dataset.channel === state.currentChannel);
@@ -341,22 +343,44 @@ function updateUI() {
 function registerUser() {
     let login = document.getElementById('regUser').value.trim();
     let pass = document.getElementById('regPass').value.trim();
-    if (!login || !pass) { alert('Заполните все поля'); return; }
+    let passConfirm = document.getElementById('regPassConfirm').value.trim();
+    
+    document.querySelectorAll('.auth-box .error').forEach(e => e.style.display = 'none');
+    document.querySelectorAll('.auth-box .success').forEach(e => e.style.display = 'none');
+    
+    if (!login || !pass || !passConfirm) {
+        alert('Заполните все поля');
+        return;
+    }
+    if (pass !== passConfirm) {
+        document.getElementById('passError').style.display = 'block';
+        return;
+    }
     if (state.users[login]) {
         document.getElementById('registerError').style.display = 'block';
         return;
     }
+    
     state.users[login] = pass;
     state.profiles[login] = {nick: login, desc: ''};
     state.currentUser = login;
     saveState();
-    showApp();
+    
+    document.getElementById('registerSuccess').style.display = 'block';
+    setTimeout(() => {
+        showApp();
+    }, 500);
 }
 
 function loginUser() {
     let login = document.getElementById('loginUser').value.trim();
     let pass = document.getElementById('loginPass').value.trim();
-    if (!login || !pass) { alert('Заполните все поля'); return; }
+    document.getElementById('loginError').style.display = 'none';
+    
+    if (!login || !pass) {
+        alert('Заполните все поля');
+        return;
+    }
     if (state.users[login] === pass) {
         state.currentUser = login;
         saveState();
