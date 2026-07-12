@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Vibespace — Discord</title>
+<title>Vibespace — онлайн-чат</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100vh;display:flex;overflow:hidden;font-size:13px}
 
-/* ===== ЛЕВАЯ ПАНЕЛЬ (СЕРВЕРЫ) ===== */
+/* ===== ЛЕВАЯ ПАНЕЛЬ ===== */
 .servers{width:60px;background:#1e1f22;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:6px;flex-shrink:0;overflow-y:auto}
 .servers::-webkit-scrollbar{width:0}
 .server-icon{width:42px;height:42px;border-radius:14px;background:#2b2d31;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;color:#dcddde;cursor:pointer;transition:0.15s;position:relative;flex-shrink:0}
@@ -19,7 +19,7 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .add-server{width:42px;height:42px;border-radius:14px;background:#1e1f22;border:2px dashed #2b2d31;display:flex;align-items:center;justify-content:center;font-size:24px;color:#3d8a40;cursor:pointer;transition:0.15s;flex-shrink:0}
 .add-server:hover{background:#2b2d31;border-color:#3d8a40}
 
-/* ===== ПАНЕЛЬ КАНАЛОВ ===== */
+/* ===== КАНАЛЫ ===== */
 .channels{width:210px;background:#2b2d31;display:flex;flex-direction:column;flex-shrink:0}
 .channels-header{padding:12px 14px 6px;border-bottom:1px solid #1e1f22;display:flex;justify-content:space-between;align-items:center}
 .channels-header .server-name{font-weight:600;font-size:14px;color:#fff;cursor:pointer}
@@ -38,14 +38,14 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .channel-item.active .hash{color:#fff}
 .channel-item .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
 
-/* ===== ОСНОВНОЙ ЧАТ ===== */
+/* ===== ЧАТ ===== */
 .chat{flex:1;display:flex;flex-direction:column;background:#313338;min-width:0}
 .chat-header{padding:8px 14px;border-bottom:1px solid #1e1f22;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#313338}
 .chat-header .left{display:flex;align-items:center;gap:8px}
 .chat-header .left .channel-name{font-weight:600;font-size:14px;color:#fff}
 .chat-header .left .topic{font-size:12px;color:#9a9ba0;margin-left:6px}
-.chat-header .right{display:flex;gap:4px}
-.chat-header .right button{background:none;border:none;color:#9a9ba0;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:6px;transition:0.1s}
+.chat-header .right{display:flex;gap:4px;align-items:center}
+.chat-header .right button{background:none;border:none;color:#9a9ba0;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:0.1s}
 .chat-header .right button:hover{background:#2b2d31;color:#fff}
 
 .chat-messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:1px}
@@ -70,7 +70,7 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .input-area .input-wrap button{background:#5865f2;border:none;border-radius:4px;padding:4px 12px;color:#fff;font-weight:600;font-size:12px;cursor:pointer;transition:0.15s;font-family:'Inter',sans-serif;flex-shrink:0}
 .input-area .input-wrap button:hover{background:#4752c4}
 
-/* ===== ПАНЕЛЬ УЧАСТНИКОВ ===== */
+/* ===== УЧАСТНИКИ ===== */
 .members{width:200px;background:#2b2d31;display:flex;flex-direction:column;flex-shrink:0;border-left:1px solid #1e1f22}
 .members-header{padding:14px 12px 8px;font-size:12px;font-weight:700;color:#6a6a8a;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid #1e1f22}
 .members-list{flex:1;overflow-y:auto;padding:6px 6px 0}
@@ -103,32 +103,30 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 .modal-content .profile-field{margin-bottom:6px}
 .modal-content .profile-field label{color:#9a9ba0;font-size:12px;display:block;margin-bottom:2px}
 
-/* ===== ВЫПАДАЮЩЕЕ МЕНЮ (ПРОФИЛЬ) ===== */
-.dropdown{display:none;position:absolute;top:40px;right:0;background:#2b2d31;border-radius:8px;padding:6px;min-width:180px;border:1px solid #1e1f22;z-index:100}
+.dropdown{display:none;position:absolute;top:38px;right:0;background:#2b2d31;border-radius:8px;padding:6px;min-width:180px;border:1px solid #1e1f22;z-index:100}
 .dropdown.show{display:block}
 .dropdown-item{padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:#dcddde;transition:0.1s}
 .dropdown-item:hover{background:#313338;color:#fff}
 .dropdown-item .icon{margin-right:8px}
 .dropdown-divider{height:1px;background:#1e1f22;margin:4px 0}
 
-/* ===== АДАПТИВ ===== */
 @media(max-width:768px){.servers{width:50px}.channels,.members{display:none}.chat{flex:1}}
 </style>
 </head>
 <body>
 
 <!-- ===== СЕРВЕРЫ ===== -->
-<div class="servers" id="serverList">
-    <div class="server-icon active" data-server="main">V</div>
+<div class="servers">
+    <div class="server-icon active">V</div>
     <div class="server-divider"></div>
     <div class="add-server" onclick="createServer()">+</div>
 </div>
 
 <!-- ===== КАНАЛЫ ===== -->
-<div class="channels" id="channelPanel">
+<div class="channels">
     <div class="channels-header">
         <div class="server-name" id="currentServerName">Vibespace <span class="arrow">▼</span></div>
-        <button class="menu-btn" onclick="toggleServerMenu()">⋯</button>
+        <button class="menu-btn" onclick="alert('Меню сервера')">⋯</button>
     </div>
     <div class="channels-list" id="channelList">
         <div class="channel-category">Текстовые</div>
@@ -146,14 +144,13 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 </div>
 
 <!-- ===== ЧАТ ===== -->
-<div class="chat" id="chatPanel">
+<div class="chat">
     <div class="chat-header">
         <div class="left">
             <span class="channel-name" id="currentChannel"># общий</span>
-            <span class="topic" id="channelTopic">Добро пожаловать!</span>
+            <span class="topic" id="channelTopic">Онлайн-чат</span>
         </div>
         <div class="right" style="position:relative">
-            <!-- Кнопка профиля с выпадающим меню -->
             <button onclick="toggleProfileMenu()" id="profileBtn" title="Профиль">👤</button>
             <div class="dropdown" id="profileDropdown">
                 <div class="dropdown-item" onclick="openProfile()"><span class="icon">👤</span> Мой профиль</div>
@@ -163,9 +160,9 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-item" style="color:#ed4245" onclick="logoutUser()"><span class="icon">🚪</span> Выйти</div>
             </div>
-            <!-- Кнопки регистрации/входа -->
             <button onclick="openModal('loginModal')" id="loginBtn" title="Вход">🔑</button>
             <button onclick="openModal('registerModal')" id="registerBtn" title="Регистрация">📝</button>
+            <span id="onlineStatus" style="font-size:11px;color:#3d8a40;margin-left:6px;">● Онлайн</span>
         </div>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
@@ -178,30 +175,29 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 </div>
 
 <!-- ===== УЧАСТНИКИ ===== -->
-<div class="members" id="memberPanel">
+<div class="members">
     <div class="members-header">Участники — <span id="memberCount">0</span></div>
     <div class="members-list" id="memberList"></div>
 </div>
 
-<!-- ===== МОДАЛКА ПРОФИЛЯ ===== -->
+<!-- ===== МОДАЛКИ ===== -->
 <div class="modal" id="profileModal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('profileModal')">&times;</button>
         <h2>👤 Мой профиль</h2>
         <div class="profile-field">
             <label>Никнейм</label>
-            <input id="profileNick" value="гость" readonly style="background:#1e1f22;color:#dcddde">
+            <input id="profileNick">
         </div>
         <div class="profile-field">
             <label>Описание</label>
-            <input id="profileDesc" placeholder="О себе..." style="background:#1e1f22;color:#dcddde">
+            <input id="profileDesc" placeholder="О себе...">
         </div>
         <button class="btn-primary" onclick="saveProfile()">Сохранить</button>
         <button class="btn-secondary" onclick="closeModal('profileModal')">Закрыть</button>
     </div>
 </div>
 
-<!-- ===== МОДАЛКА СОЗДАНИЯ ЧАТА ===== -->
 <div class="modal" id="createChatModal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('createChatModal')">&times;</button>
@@ -213,7 +209,6 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
     </div>
 </div>
 
-<!-- ===== МОДАЛКА ВХОДА ===== -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('loginModal')">&times;</button>
@@ -226,7 +221,6 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
     </div>
 </div>
 
-<!-- ===== МОДАЛКА РЕГИСТРАЦИИ ===== -->
 <div class="modal" id="registerModal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('registerModal')">&times;</button>
@@ -239,7 +233,6 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
     </div>
 </div>
 
-<!-- ===== МОДАЛКА АДМИНКИ ===== -->
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <button class="close" onclick="closeModal('adminModal')">&times;</button>
@@ -257,40 +250,76 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#dcddde;height:100v
 <script>
 // ====== СОСТОЯНИЕ ======
 let state = {
-    users: {},
-    currentUser: null,
+    users: JSON.parse(localStorage.getItem('vibespace_users')) || {},
+    currentUser: localStorage.getItem('vibespace_session') || null,
     currentChannel: 'general',
-    messages: { general: [], random: [], voice: [] },
+    messages: JSON.parse(localStorage.getItem('vibespace_messages')) || { general: [], random: [], voice: [] },
     channels: ['general', 'random', 'voice'],
     serverName: 'Vibespace',
     adminLogged: false,
-    logs: [],
-    profiles: {} // login: {nick, desc}
+    profiles: JSON.parse(localStorage.getItem('vibespace_profiles')) || {}
+};
+
+// ====== СОХРАНЕНИЕ В localStorage ======
+function saveState() {
+    localStorage.setItem('vibespace_users', JSON.stringify(state.users));
+    localStorage.setItem('vibespace_session', state.currentUser);
+    localStorage.setItem('vibespace_messages', JSON.stringify(state.messages));
+    localStorage.setItem('vibespace_profiles', JSON.stringify(state.profiles));
+}
+
+// ====== BROADCAST CHANNEL (ОНЛАЙН-ОБНОВЛЕНИЯ) ======
+let channel = new BroadcastChannel('vibespace_chat');
+
+channel.onmessage = function(e) {
+    let data = e.data;
+    if (data.type === 'new_message') {
+        // Добавляем сообщение в нужный канал
+        if (!state.messages[data.channel]) state.messages[data.channel] = [];
+        state.messages[data.channel].push({ author: data.author, text: data.text, time: data.time });
+        if (state.currentChannel === data.channel) {
+            renderMessages();
+        }
+        saveState();
+    } else if (data.type === 'new_channel') {
+        if (!state.channels.includes(data.channel)) {
+            state.channels.push(data.channel);
+            state.messages[data.channel] = [];
+            addChannelToList(data.channel);
+            saveState();
+        }
+    } else if (data.type === 'user_update') {
+        // Обновляем список участников
+        renderMembers();
+    }
 };
 
 // ====== ИНИЦИАЛИЗАЦИЯ ======
 function init() {
-    state.users['admin'] = 'admin123';
-    state.users['ван'] = '123';
-    state.users['test'] = 'test';
-    state.profiles['admin'] = {nick:'admin', desc:'Главный администратор'};
-    state.profiles['ван'] = {nick:'ван', desc:'Просто ван'};
-    state.profiles['test'] = {nick:'test', desc:'Тестовый аккаунт'};
+    // Демо-пользователи, если нет сохранённых
+    if (Object.keys(state.users).length === 0) {
+        state.users['admin'] = 'admin123';
+        state.users['ван'] = '123';
+        state.users['test'] = 'test';
+        state.profiles['admin'] = {nick:'admin', desc:'Главный администратор'};
+        state.profiles['ван'] = {nick:'ван', desc:'Просто ван'};
+        state.profiles['test'] = {nick:'test', desc:'Тестовый аккаунт'};
+    }
     
-    state.messages.general = [
-        {author: 'admin', text: 'Добро пожаловать в Vibespace!', time: new Date().toLocaleTimeString()},
-        {author: 'ван', text: 'Привет всем!', time: new Date().toLocaleTimeString()}
-    ];
-    state.messages.random = [
-        {author: 'admin', text: 'Это случайный канал', time: new Date().toLocaleTimeString()}
-    ];
-    
-    let saved = localStorage.getItem('rys_session');
-    state.currentUser = (saved && state.users[saved]) ? saved : null;
+    if (state.messages.general.length === 0) {
+        state.messages.general = [
+            {author: 'admin', text: 'Добро пожаловать в Vibespace!', time: new Date().toLocaleTimeString()},
+            {author: 'ван', text: 'Привет всем!', time: new Date().toLocaleTimeString()}
+        ];
+        state.messages.random = [
+            {author: 'admin', text: 'Это случайный канал', time: new Date().toLocaleTimeString()}
+        ];
+    }
     
     renderAll();
     updateUI();
     updateAuthButtons();
+    saveState();
 }
 
 function renderAll() {
@@ -317,8 +346,9 @@ function updateAuthButtons() {
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
         profileBtn.style.display = 'inline-block';
-        document.getElementById('profileNick').value = state.profiles[state.currentUser]?.nick || state.currentUser;
-        document.getElementById('profileDesc').value = state.profiles[state.currentUser]?.desc || '';
+        let prof = state.profiles[state.currentUser] || {};
+        document.getElementById('profileNick').value = prof.nick || state.currentUser;
+        document.getElementById('profileDesc').value = prof.desc || '';
     } else {
         loginBtn.style.display = 'inline-block';
         registerBtn.style.display = 'inline-block';
@@ -358,12 +388,34 @@ function renderMessages() {
 function sendMessage() {
     let input = document.getElementById('msgInput');
     let text = input.value.trim();
-    if (!text || !state.currentUser) { if(!state.currentUser) alert('Сначала войдите в аккаунт'); return; }
-    if (!state.messages[state.currentChannel]) state.messages[state.currentChannel] = [];
-    state.messages[state.currentChannel].push({author: state.currentUser, text: text, time: new Date().toLocaleTimeString()});
+    if (!text) return;
+    if (!state.currentUser) {
+        alert('Сначала войдите в аккаунт!');
+        return;
+    }
+    if (!state.messages[state.currentChannel]) {
+        state.messages[state.currentChannel] = [];
+    }
+    
+    let msg = {
+        author: state.currentUser,
+        text: text,
+        time: new Date().toLocaleTimeString()
+    };
+    
+    state.messages[state.currentChannel].push(msg);
     input.value = '';
     renderMessages();
-    addLog(state.currentUser + ': ' + text);
+    saveState();
+    
+    // Отправляем через Broadcast Channel
+    channel.postMessage({
+        type: 'new_message',
+        channel: state.currentChannel,
+        author: msg.author,
+        text: msg.text,
+        time: msg.time
+    });
 }
 
 function copyText(btn) {
@@ -377,7 +429,9 @@ function copyText(btn) {
 document.querySelectorAll('.channel-item').forEach(el => {
     el.addEventListener('click', function() {
         state.currentChannel = this.dataset.channel;
-        renderAll(); updateUI();
+        renderAll();
+        updateUI();
+        saveState();
     });
 });
 
@@ -385,17 +439,14 @@ document.querySelectorAll('.channel-item').forEach(el => {
 function toggleProfileMenu() {
     document.getElementById('profileDropdown').classList.toggle('show');
 }
-function toggleServerMenu() {
-    // для будущего расширения
-    alert('Меню сервера (в разработке)');
-}
 
 // ====== ПРОФИЛЬ ======
 function openProfile() {
-    closeModal('profileDropdown');
+    document.getElementById('profileDropdown').classList.remove('show');
     if (!state.currentUser) { alert('Сначала войдите'); return; }
-    document.getElementById('profileNick').value = state.profiles[state.currentUser]?.nick || state.currentUser;
-    document.getElementById('profileDesc').value = state.profiles[state.currentUser]?.desc || '';
+    let prof = state.profiles[state.currentUser] || {};
+    document.getElementById('profileNick').value = prof.nick || state.currentUser;
+    document.getElementById('profileDesc').value = prof.desc || '';
     openModal('profileModal');
 }
 
@@ -405,13 +456,14 @@ function saveProfile() {
     state.profiles[state.currentUser].nick = document.getElementById('profileNick').value || state.currentUser;
     state.profiles[state.currentUser].desc = document.getElementById('profileDesc').value || '';
     closeModal('profileModal');
-    addLog('Профиль обновлён');
+    renderMembers();
+    saveState();
     alert('Профиль сохранён!');
 }
 
 // ====== СОЗДАНИЕ ЧАТА ======
 function openCreateChat() {
-    closeModal('profileDropdown');
+    document.getElementById('profileDropdown').classList.remove('show');
     openModal('createChatModal');
 }
 
@@ -421,7 +473,18 @@ function createChannel() {
     if (state.channels.includes(name)) { alert('Такой канал уже есть'); return; }
     state.channels.push(name);
     state.messages[name] = [];
-    // Добавляем в список
+    addChannelToList(name);
+    saveState();
+    
+    // Отправляем через Broadcast
+    channel.postMessage({ type: 'new_channel', channel: name });
+    
+    closeModal('createChatModal');
+    document.getElementById('newChannelName').value = '';
+    alert('Канал создан!');
+}
+
+function addChannelToList(name) {
     let list = document.getElementById('channelList');
     let cat = list.querySelector('.channel-category');
     let item = document.createElement('div');
@@ -430,13 +493,12 @@ function createChannel() {
     item.innerHTML = `<span class="hash">#</span><span class="name">${name}</span>`;
     item.addEventListener('click', function() {
         state.currentChannel = this.dataset.channel;
-        renderAll(); updateUI();
+        renderAll();
+        updateUI();
+        saveState();
     });
+    // Вставляем после категории "Текстовые"
     list.insertBefore(item, cat.nextSibling);
-    closeModal('createChatModal');
-    document.getElementById('newChannelName').value = '';
-    addLog('Создан канал: ' + name);
-    alert('Канал создан!');
 }
 
 // ====== АККАУНТЫ ======
@@ -448,10 +510,12 @@ function registerUser() {
     state.users[login] = pass;
     state.profiles[login] = {nick: login, desc: ''};
     state.currentUser = login;
-    localStorage.setItem('rys_session', login);
+    saveState();
     closeModal('registerModal');
-    renderAll(); updateUI(); updateAuthButtons();
-    addLog('Регистрация: ' + login);
+    renderAll();
+    updateUI();
+    updateAuthButtons();
+    channel.postMessage({ type: 'user_update' });
     alert('Аккаунт создан!');
 }
 
@@ -461,10 +525,12 @@ function loginUser() {
     if (!login || !pass) { alert('Заполните все поля'); return; }
     if (state.users[login] === pass) {
         state.currentUser = login;
-        localStorage.setItem('rys_session', login);
+        saveState();
         closeModal('loginModal');
-        renderAll(); updateUI(); updateAuthButtons();
-        addLog('Вход: ' + login);
+        renderAll();
+        updateUI();
+        updateAuthButtons();
+        channel.postMessage({ type: 'user_update' });
     } else {
         alert('Неверный логин или пароль');
     }
@@ -472,18 +538,17 @@ function loginUser() {
 
 function logoutUser() {
     state.currentUser = null;
-    localStorage.removeItem('rys_session');
+    saveState();
     document.getElementById('profileDropdown').classList.remove('show');
-    renderAll(); updateUI(); updateAuthButtons();
-    addLog('Выход');
+    renderAll();
+    updateUI();
+    updateAuthButtons();
+    channel.postMessage({ type: 'user_update' });
 }
 
 // ====== МОДАЛКИ ======
 function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { 
-    document.getElementById(id).classList.remove('active'); 
-    if (id === 'profileDropdown') return;
-}
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 function switchModal(from, to) { closeModal(from); openModal(to); }
 
 // ====== АДМИНКА ======
@@ -515,18 +580,13 @@ function updateDB() {
     document.getElementById('dbDisplay').textContent = str || '(пусто)';
 }
 
-function addLog(msg) {
-    let time = new Date().toLocaleTimeString();
-    state.logs.push('[' + time + '] ' + msg);
-}
-
 // ====== СОЗДАНИЕ СЕРВЕРА ======
 function createServer() {
     let name = prompt('Название сервера:');
     if (name && name.trim()) {
         state.serverName = name.trim();
         updateUI();
-        addLog('Создан сервер: ' + state.serverName);
+        saveState();
     }
 }
 
@@ -558,7 +618,7 @@ window.onload = function() {
     document.addEventListener('click', function(e) {
         let dropdown = document.getElementById('profileDropdown');
         let btn = document.getElementById('profileBtn');
-        if (dropdown.classList.contains('show') && !dropdown.contains(e.target) && e.target !== btn) {
+        if (dropdown && dropdown.classList.contains('show') && !dropdown.contains(e.target) && e.target !== btn) {
             dropdown.classList.remove('show');
         }
     });
